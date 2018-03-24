@@ -1,0 +1,14 @@
+{
+    "name": "Content Decryptor",
+    "version": "0.0",
+    "description": "Decrypt your social media content!",
+    "permissions": ["declarativeContent", "storage"],
+    "background": {
+        "scripts": ["background.js"],
+        "persistent": false
+    },
+    "page_action": {
+        "default_popup": "popup.html"
+    },
+    "manifest_version": 2
+}
