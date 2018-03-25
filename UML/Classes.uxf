@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.2">
+  <zoom_level>10</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>300</x>
+      <y>40</y>
+      <w>210</w>
+      <h>190</h>
+    </coordinates>
+    <panel_attributes>_Server_
+--
+Properties
+-Symmetric Key (k_sym)
++Public Key (k_pub_svr)
+-Private Key (k_pri_svr)
+--
+users: {
+  inglec: {
+    passwordHash: "a789as7df8",
+    publicKey: "6sv786s86df"
+  }
+}</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>40</x>
+      <y>40</y>
+      <w>210</w>
+      <h>190</h>
+    </coordinates>
+    <panel_attributes>_Client_
+--
+Properties
++Public Key  (k_pub_cl)
+-Private Key (k_pri_cl)
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+</diagram>
