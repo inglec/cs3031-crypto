@@ -29,7 +29,7 @@
       <x>140</x>
       <y>40</y>
       <w>310</w>
-      <h>880</h>
+      <h>910</h>
     </coordinates>
     <panel_attributes>Client
 
@@ -42,7 +42,7 @@ valign=top</panel_attributes>
       <x>450</x>
       <y>40</y>
       <w>310</w>
-      <h>880</h>
+      <h>910</h>
     </coordinates>
     <panel_attributes>Server
 valign=top</panel_attributes>
@@ -54,7 +54,7 @@ valign=top</panel_attributes>
       <x>760</x>
       <y>40</y>
       <w>310</w>
-      <h>880</h>
+      <h>910</h>
     </coordinates>
     <panel_attributes>Reddit
 valign=top</panel_attributes>
@@ -324,5 +324,27 @@ Post into DOM</panel_attributes>
 Success
 </panel_attributes>
     <additional_attributes>10.0;50.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>280</x>
+      <y>880</y>
+      <w>30</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>10.0;30.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLSpecialState</id>
+    <coordinates>
+      <x>280</x>
+      <y>910</y>
+      <w>20</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>type=final</panel_attributes>
+    <additional_attributes/>
   </element>
 </diagram>

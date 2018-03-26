@@ -4,8 +4,8 @@
   <element>
     <id>UMLSpecialState</id>
     <coordinates>
-      <x>470</x>
-      <y>100</y>
+      <x>510</x>
+      <y>50</y>
       <w>20</w>
       <h>20</h>
     </coordinates>
@@ -15,8 +15,8 @@
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>470</x>
-      <y>110</y>
+      <x>510</x>
+      <y>60</y>
       <w>30</w>
       <h>70</h>
     </coordinates>
@@ -26,10 +26,10 @@
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>330</x>
-      <y>50</y>
+      <x>370</x>
+      <y>0</y>
       <w>310</w>
-      <h>850</h>
+      <h>870</h>
     </coordinates>
     <panel_attributes>Client
 
@@ -39,10 +39,10 @@ valign=top</panel_attributes>
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>640</x>
-      <y>50</y>
+      <x>680</x>
+      <y>0</y>
       <w>310</w>
-      <h>850</h>
+      <h>870</h>
     </coordinates>
     <panel_attributes>Server
 
@@ -52,8 +52,8 @@ valign=top</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>470</x>
-      <y>240</y>
+      <x>510</x>
+      <y>190</y>
       <w>30</w>
       <h>70</h>
     </coordinates>
@@ -63,8 +63,8 @@ valign=top</panel_attributes>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>420</x>
-      <y>290</y>
+      <x>460</x>
+      <y>240</y>
       <w>120</w>
       <h>40</h>
     </coordinates>
@@ -75,8 +75,8 @@ k_pub_svr</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>400</x>
-      <y>160</y>
+      <x>440</x>
+      <y>110</y>
       <w>170</w>
       <h>90</h>
     </coordinates>
@@ -90,8 +90,8 @@ k_pub_svr</panel_attributes>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>420</x>
-      <y>370</y>
+      <x>460</x>
+      <y>320</y>
       <w>120</w>
       <h>40</h>
     </coordinates>
@@ -101,8 +101,8 @@ k_pub_svr</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>470</x>
-      <y>320</y>
+      <x>510</x>
+      <y>270</y>
       <w>30</w>
       <h>70</h>
     </coordinates>
@@ -112,8 +112,8 @@ k_pub_svr</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>530</x>
-      <y>380</y>
+      <x>570</x>
+      <y>330</y>
       <w>230</w>
       <h>30</h>
     </coordinates>
@@ -123,8 +123,8 @@ k_pub_svr</panel_attributes>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>740</x>
-      <y>370</y>
+      <x>780</x>
+      <y>320</y>
       <w>120</w>
       <h>40</h>
     </coordinates>
@@ -135,8 +135,8 @@ k_pri_svr</panel_attributes>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>420</x>
-      <y>820</y>
+      <x>460</x>
+      <y>770</y>
       <w>120</w>
       <h>40</h>
     </coordinates>
@@ -146,8 +146,8 @@ k_pri_svr</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>530</x>
-      <y>830</y>
+      <x>570</x>
+      <y>780</y>
       <w>230</w>
       <h>30</h>
     </coordinates>
@@ -157,8 +157,8 @@ k_pri_svr</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>790</x>
-      <y>480</y>
+      <x>830</x>
+      <y>430</y>
       <w>90</w>
       <h>70</h>
     </coordinates>
@@ -170,8 +170,8 @@ New User
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>740</x>
-      <y>530</y>
+      <x>780</x>
+      <y>480</y>
       <w>120</w>
       <h>40</h>
     </coordinates>
@@ -181,8 +181,8 @@ New User
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>790</x>
-      <y>560</y>
+      <x>830</x>
+      <y>510</y>
       <w>30</w>
       <h>70</h>
     </coordinates>
@@ -192,8 +192,8 @@ New User
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>720</x>
-      <y>610</y>
+      <x>760</x>
+      <y>560</y>
       <w>170</w>
       <h>90</h>
     </coordinates>
@@ -207,8 +207,8 @@ New User
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>790</x>
-      <y>690</y>
+      <x>830</x>
+      <y>640</y>
       <w>30</w>
       <h>70</h>
     </coordinates>
@@ -219,8 +219,8 @@ New User
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>740</x>
-      <y>740</y>
+      <x>780</x>
+      <y>690</y>
       <w>120</w>
       <h>40</h>
     </coordinates>
@@ -230,8 +230,8 @@ New User
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>740</x>
-      <y>820</y>
+      <x>780</x>
+      <y>770</y>
       <w>120</w>
       <h>40</h>
     </coordinates>
@@ -241,8 +241,8 @@ New User
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>790</x>
-      <y>770</y>
+      <x>830</x>
+      <y>720</y>
       <w>30</w>
       <h>70</h>
     </coordinates>
@@ -252,8 +252,8 @@ New User
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>810</x>
-      <y>460</y>
+      <x>850</x>
+      <y>410</y>
       <w>120</w>
       <h>400</h>
     </coordinates>
@@ -263,8 +263,8 @@ New User
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>790</x>
-      <y>400</y>
+      <x>830</x>
+      <y>350</y>
       <w>30</w>
       <h>70</h>
     </coordinates>
@@ -274,8 +274,8 @@ New User
   <element>
     <id>UMLSpecialState</id>
     <coordinates>
-      <x>780</x>
-      <y>450</y>
+      <x>820</x>
+      <y>400</y>
       <w>40</w>
       <h>40</h>
     </coordinates>
@@ -285,13 +285,35 @@ New User
   <element>
     <id>Text</id>
     <coordinates>
-      <x>820</x>
-      <y>440</y>
+      <x>860</x>
+      <y>390</y>
       <w>90</w>
       <h>30</h>
     </coordinates>
     <panel_attributes>User Exists
 style=wordwrap</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>510</x>
+      <y>800</y>
+      <w>30</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>10.0;30.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLSpecialState</id>
+    <coordinates>
+      <x>510</x>
+      <y>830</y>
+      <w>20</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>type=final</panel_attributes>
     <additional_attributes/>
   </element>
 </diagram>
