@@ -1,4 +1,6 @@
 Firebase/functions/node_modules/
-Firebase/functions/keys/
+Firebase/functions/.runtimeconfig.json
 Firebase/node_modules/
 Firebase/.firebaserc
+Firebase/.runtimeconfig.json
+Extension/node_modules/
