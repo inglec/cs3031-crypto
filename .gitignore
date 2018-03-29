@@ -4,3 +4,4 @@ Firebase/node_modules/
 Firebase/.firebaserc
 Firebase/.runtimeconfig.json
 Extension/node_modules/
+Extension/js/browserify/
