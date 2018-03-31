@@ -1,18 +1,19 @@
-onload = function() {
-    // Inject encryption button into submission page
-    var html = "";
-    html += "<span class='title'>encryption group</span>";
-    html += "<input id='text-group-id' type='text'>";
-    html += "<button id='button-encrypt' type='button'>Encrypt My Post!</button>";
-    $('#text-field').append(html);
-    $('#button-encrypt').click(encrypt);
-}
-
 // NodeJS modules
-const rsa = require('node-rsa');
+const rsa = require('node-rsa'); // RSA encryption library.
 
 const serverUrl = 'https://inglec-crypto.firebaseapp.com';
 const serverPublicKey = new rsa('-----BEGIN PUBLIC KEY-----MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA8TFBLh5VYqPa40YR/rGUTND1Qsi0DOa32whICYFmzQ61uYKm2IKbvGGQ8Yoai/oS4aeFvw8zfEPtd/ryUQ5qULfxBuE6fVn3T5uxJCYaXR4EAxuRu4WOTa9gl3R27PtkEK2CfpgRcp7rx8/T2I89IcEcKP9PnHMf0InitLVf7D7bSBxMCzWkdYJ7qIl3cnEpGjn7I5sCrQX0iEXIuJIUYw3GTsM1EwUTKg51fRTqqOS4CoWWN/eNy4R6fJs4ckQiaKp2hPYM3U0RVyPOLpYftJwQJJz2WRtMgl+ZPHOL0lIkiP0NpcXCQHK698IppCOhY48D9276WgkibXQcATrIMwIDAQAB-----END PUBLIC KEY-----');
+
+
+onload = function() {
+    // Inject encryption button into submission page
+    var html = '';
+    html += '<span class="title">encryption group</span>';
+    html += '<input id="text-group-id" type="text">';
+    html += '<button id="button-encrypt" type="button">Encrypt My Post!</button>';
+    $('#text-field').append(html);
+    $('#button-encrypt').click(encrypt);
+}
 
 function encrypt() {
     var title = $('[name=title]').val(); // Get title of post.

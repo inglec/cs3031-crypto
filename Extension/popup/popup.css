@@ -4,5 +4,9 @@ body {
 }
 
 .card {
-    width: 18rem;
+    width: 20rem;
+}
+
+.table td, .table th {
+    padding: .5rem;
 }

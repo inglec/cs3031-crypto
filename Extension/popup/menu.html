@@ -2,13 +2,50 @@
 <html>
     <head>
         <link rel='stylesheet' href='../dist/css/bootstrap.min.css'>
+        <link rel='stylesheet' href='../dist/open-iconic/css/open-iconic-bootstrap.min.css'>
         <link rel='stylesheet' href='popup.css'>
     </head>
     <body>
         <div class='card'>
             <div class='card-body'>
-                <p id='welcome'></p>
-                <button id='button-sign-out' type='button' class='btn btn-danger'>Sign Out</button>
+                <div class='row'>
+                    <div class='col'>
+                        <h5 id='welcome' class='card-title'></h5>
+                    </div>
+                    <div class='col-auto'>
+                        <button id='button-sign-out' type='button' class='btn btn-danger float-right'>Sign Out</button>
+                    </div>
+                </div>
+                <hr>
+                <div>
+                    <p class='h6'>My Groups:</p>
+                    <table class='table table-hover'>
+                        <thead class='thead-light'>
+                            <th scope='col'>#</th>
+                            <th scope='col'>Group Name</th>
+                        </thead>
+                        <tbody id='admin'>
+                            <!-- Inject table data with JS -->
+                        </tbody>
+                    </table>
+                    <div class='input-group mb-3'>
+                        <input id='input-group-name' type='text' class='form-control' placeholder='New group name'>
+                        <div class='input-group-append'>
+                            <button id='button-create-group' class='btn btn-outline-secondary' type='button'>Create</button>
+                        </div>
+                    </div>
+                    <hr>
+                    <p class='h6'>Others' Groups:</p>
+                    <table class='table table-hover'>
+                        <thead class='thead-light'>
+                            <th scope='col'>#</th>
+                            <th scope='col'>Group Name</th>
+                        </thead>
+                        <tbody id='user'>
+                            <!-- Inject table data with JS -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
@@ -16,6 +53,6 @@
         <script src='../dist/js/popper.min.js'></script>
         <script src='../dist/js/bootstrap.min.js'></script>
 
-        <script src='../js/menu.js'></script>
+        <script src='../js/browserify/menu-bundle.js'></script>
     </body>
 </html>

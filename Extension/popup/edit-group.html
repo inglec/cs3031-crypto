@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel='stylesheet' href='../dist/css/bootstrap.min.css'>
+        <link rel='stylesheet' href='../dist/open-iconic/css/open-iconic-bootstrap.min.css'>
+        <link rel='stylesheet' href='popup.css'>
+    </head>
+    <body>
+        <div class='card'>
+            <div class='card-body'>
+                <h5 id='heading' class='card-title'></h5>
+                <p class='h6'>Group members:</p>
+                <table class='table table-hover'>
+                    <thead class='thead-light'>
+                        <th scope='col'>#</th>
+                        <th scope='col'>Member Name</th>
+                    </thead>
+                    <tbody id='members'>
+                        <!-- Inject table data with JS -->
+                    </tbody>
+                </table>
+                <div class='input-group mb-3'>
+                    <input id='input-add-user' type='text' class='form-control' placeholder='Username'>
+                    <div class='input-group-append'>
+                        <button id='button-add-to-group' class='btn btn-outline-secondary' type='button'>Add</button>
+                    </div>
+                </div>
+                <hr>
+                <button id='button-delete-group' type="button" class="btn btn-danger btn-sm btn-block">Delete Group</button>
+            </div>
+        </div>
+
+        <script src='../dist/js/jquery-3.3.1.min.js'></script>
+        <script src='../dist/js/popper.min.js'></script>
+        <script src='../dist/js/bootstrap.min.js'></script>
+
+        <script src='../js/browserify/edit-group-bundle.js'></script>
+    </body>
+</html>
