@@ -18,6 +18,7 @@ function decrypt() {
             url: window.location.href
         };
 
+        // Encrypt POST body with server's public key.
         var encrypted = serverPublicKey.encrypt(new Buffer(JSON.stringify(body), 'utf8'), 'base64');
 
         $.post(serverUrl + '/decrypt', {
@@ -28,8 +29,8 @@ function decrypt() {
                 new rsa(storage.privateKey).decrypt(new Buffer(response.encryptedContent, 'base64'), 'utf8')
             );
             // Inject decrypted post into DOM.
-            $('[data-event-action=title]').text(post.title);
-            $('.expando').find('.md').html(post.content);
+            $('[data-event-action=title]').text(post.title); // Title
+            $('.expando').find('.md').html(post.content); // Content
         }).fail(function(error) {
             $('.expando').find('.md').html('<p style="color: red;">Error: ' + error.responseText + '</p>');
         });

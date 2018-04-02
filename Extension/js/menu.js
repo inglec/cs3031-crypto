@@ -11,7 +11,7 @@ onload = function() {
         $('#welcome').text('Welcome ' + storage.username + '!');
     });
 
-    getGroups();
+    getGroups(); // Show groups that user is an admin or member of.
 }
 
 $('#button-sign-out').click(function() {

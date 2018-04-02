@@ -6,13 +6,16 @@ const serverPublicKey = new rsa('-----BEGIN PUBLIC KEY-----MIIBIjANBgkqhkiG9w0BA
 
 
 onload = function() {
-    // Inject encryption button into submission page
-    var html = '';
-    html += '<span class="title">encryption group</span>';
+    var html = '<span class="title">encryption group</span>';
+    // Text box for entering encryption group.
     html += '<input id="text-group-id" type="text">';
+    // Button to encrypt post content.
     html += '<button id="button-encrypt" type="button">Encrypt My Post!</button>';
+    // Alert for displaying errors to user.
     html += '<div id="reddecryptor-info" class="roundfield-content" style="color:#c14b4b; display: none;"></div>';
-    $('#text-field').append(html);
+    $('#text-field').append(html); // Inject HTML into DOM.
+
+    // Add event handler.
     $('#button-encrypt').click(encrypt);
 }
 

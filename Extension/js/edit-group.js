@@ -12,7 +12,7 @@ onload = function() {
     groupName = getParameterByName('group');
     $('#heading').html('<a href="menu.html"><span class="oi oi-arrow-circle-left"></span></a> Edit <b>' + groupName + '</b>');
 
-    getGroupMembers();
+    getGroupMembers(); // Show group members in HTML table.
 }
 
 function getGroupMembers() {
