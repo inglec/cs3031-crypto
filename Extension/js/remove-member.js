@@ -8,9 +8,10 @@ onload = function() {
     var group = getParameterByName('group');
     var member = getParameterByName('member'); // Member to remove from group.
 
-    chrome.storage.local.get(['username', 'privateKey'], function(storage) {
+    chrome.storage.local.get(['username', 'privateKey', 'publicKey'], function(storage) {
         var body = {
             username: storage.username,
+            publicKey: storage.publicKey,
             group: group,
             member: member
         };

@@ -11,6 +11,7 @@ onload = function() {
     html += '<span class="title">encryption group</span>';
     html += '<input id="text-group-id" type="text">';
     html += '<button id="button-encrypt" type="button">Encrypt My Post!</button>';
+    html += '<div id="reddecryptor-info" class="roundfield-content" style="color:#c14b4b; display: none;"></div>';
     $('#text-field').append(html);
     $('#button-encrypt').click(encrypt);
 }
@@ -40,12 +41,18 @@ function encrypt() {
         $.post(serverUrl + '/encrypt', {
             encryptedContent: encrypted
         }, function(response) {
+            $('#reddecryptor-info').hide(); // Hide error messages.
+
             var post = JSON.parse(
                 new rsa(storage.privateKey).decrypt(new Buffer(response.encryptedContent, 'base64'), 'utf8')
             );
             // Inject encrypted post into DOM.
             $('[name=title]').val(post.title);
             $('[name=text]').val(post.content);
-        });
+        }).fail(function (error) {
+            // Show error message.
+            $('#reddecryptor-info').show();
+            $('#reddecryptor-info').text('Error: ' + error.responseText);
+        })
     });
 }

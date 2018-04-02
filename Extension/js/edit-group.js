@@ -4,6 +4,7 @@ const rsa = require('node-rsa'); // RSA encryption library.
 const serverUrl = 'https://inglec-crypto.firebaseapp.com';
 const serverPublicKey = new rsa('-----BEGIN PUBLIC KEY-----MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA8TFBLh5VYqPa40YR/rGUTND1Qsi0DOa32whICYFmzQ61uYKm2IKbvGGQ8Yoai/oS4aeFvw8zfEPtd/ryUQ5qULfxBuE6fVn3T5uxJCYaXR4EAxuRu4WOTa9gl3R27PtkEK2CfpgRcp7rx8/T2I89IcEcKP9PnHMf0InitLVf7D7bSBxMCzWkdYJ7qIl3cnEpGjn7I5sCrQX0iEXIuJIUYw3GTsM1EwUTKg51fRTqqOS4CoWWN/eNy4R6fJs4ckQiaKp2hPYM3U0RVyPOLpYftJwQJJz2WRtMgl+ZPHOL0lIkiP0NpcXCQHK698IppCOhY48D9276WgkibXQcATrIMwIDAQAB-----END PUBLIC KEY-----');
 
+const message = $('#message');
 
 var groupName;
 
@@ -16,9 +17,10 @@ onload = function() {
 
 function getGroupMembers() {
     // Get group users.
-    chrome.storage.local.get(['username', 'privateKey'], function(storage) {
+    chrome.storage.local.get(['username', 'privateKey', 'publicKey'], function(storage) {
         var body = {
             username: storage.username,
+            publicKey: storage.publicKey, // Acts as session token.
             group: groupName
         };
         var encrypted = serverPublicKey.encrypt(new Buffer(JSON.stringify(body), 'utf8'), 'base64');
@@ -47,9 +49,10 @@ function getGroupMembers() {
 $('#button-add-to-group').click(function() {
     var member = $('#input-add-user').val(); // Get user from input field.
 
-    chrome.storage.local.get(['username', 'privateKey'], function(storage) {
+    chrome.storage.local.get(['username', 'privateKey', 'publicKey'], function(storage) {
         var body = {
             username: storage.username,
+            publicKey: storage.publicKey,
             group: groupName,
             member: member
         };
@@ -59,16 +62,22 @@ $('#button-add-to-group').click(function() {
             encryptedContent: encrypted
         },
         function(response) {
+            message.hide(); // Hide error message.
             $('#input-add-user').val(''); // Clear field
             getGroupMembers();
+        }).fail(function(error) {
+            message.show();
+            message.attr('class','alert alert-danger');
+            message.text(error.responseText);
         });
     });
 });
 
 $('#button-delete-group').click(function() {
-    chrome.storage.local.get(['username', 'privateKey'], function(storage) {
+    chrome.storage.local.get(['username', 'privateKey', 'publicKey'], function(storage) {
         var body = {
             username: storage.username,
+            publicKey: storage.publicKey,
             group: groupName
         };
         var encrypted = serverPublicKey.encrypt(new Buffer(JSON.stringify(body), 'utf8'), 'base64');

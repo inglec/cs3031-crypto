@@ -41,6 +41,7 @@ $('#button-sign-in').click(function() {
             // Username and password are correct.
             chrome.storage.local.set({
                 username: username,
+                publicKey: keys.publicKey,
                 privateKey: keys.privateKey
             }, function() {
                 message.attr('class','alert alert-success');

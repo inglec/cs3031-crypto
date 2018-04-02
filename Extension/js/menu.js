@@ -4,6 +4,7 @@ const rsa = require('node-rsa'); // RSA encryption library.
 const serverUrl = 'https://inglec-crypto.firebaseapp.com';
 const serverPublicKey = new rsa('-----BEGIN PUBLIC KEY-----MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA8TFBLh5VYqPa40YR/rGUTND1Qsi0DOa32whICYFmzQ61uYKm2IKbvGGQ8Yoai/oS4aeFvw8zfEPtd/ryUQ5qULfxBuE6fVn3T5uxJCYaXR4EAxuRu4WOTa9gl3R27PtkEK2CfpgRcp7rx8/T2I89IcEcKP9PnHMf0InitLVf7D7bSBxMCzWkdYJ7qIl3cnEpGjn7I5sCrQX0iEXIuJIUYw3GTsM1EwUTKg51fRTqqOS4CoWWN/eNy4R6fJs4ckQiaKp2hPYM3U0RVyPOLpYftJwQJJz2WRtMgl+ZPHOL0lIkiP0NpcXCQHK698IppCOhY48D9276WgkibXQcATrIMwIDAQAB-----END PUBLIC KEY-----');
 
+const message = $('#message');
 
 onload = function() {
     chrome.storage.local.get('username', function(storage) {
@@ -22,9 +23,10 @@ $('#button-sign-out').click(function() {
 $('#button-create-group').click(function() {
     var group = $('#input-group-name').val();
 
-    chrome.storage.local.get(['username', 'privateKey'], function(storage) {
+    chrome.storage.local.get(['username', 'privateKey', 'publicKey'], function(storage) {
         var body = {
             username: storage.username,
+            publicKey: storage.publicKey,
             group: group
         };
         var encrypted = serverPublicKey.encrypt(new Buffer(JSON.stringify(body), 'utf8'), 'base64');
@@ -34,14 +36,20 @@ $('#button-create-group').click(function() {
         },
         function(response) {
             getGroups(); // Update groups
+            message.hide();
+        }).fail(function(error) {
+            message.show();
+            message.attr('class','alert alert-danger');
+            message.text(error.responseText);
         });
     });
 });
 
 function getGroups() {
-    chrome.storage.local.get(['username', 'privateKey'], function(storage) {
+    chrome.storage.local.get(['username', 'privateKey', 'publicKey'], function(storage) {
         var body = {
-            username: storage.username
+            username: storage.username,
+            publicKey: storage.publicKey
         };
         var encrypted = serverPublicKey.encrypt(new Buffer(JSON.stringify(body), 'utf8'), 'base64');
 

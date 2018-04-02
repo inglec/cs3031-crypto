@@ -30,6 +30,8 @@ function decrypt() {
             // Inject decrypted post into DOM.
             $('[data-event-action=title]').text(post.title);
             $('.expando').find('.md').html(post.content);
+        }).fail(function(error) {
+            $('.expando').find('.md').html('<p style="color: red;">Error: ' + error.responseText + '</p>');
         });
     });
 

@@ -7,9 +7,10 @@ const serverPublicKey = new rsa('-----BEGIN PUBLIC KEY-----MIIBIjANBgkqhkiG9w0BA
 onload = function() {
     var group = getParameterByName('group');
 
-    chrome.storage.local.get(['username', 'privateKey'], function(storage) {
+    chrome.storage.local.get(['username', 'privateKey', 'publicKey'], function(storage) {
         var body = {
             username: storage.username,
+            publicKey: storage.publicKey,
             group: group
         };
         var encrypted = serverPublicKey.encrypt(new Buffer(JSON.stringify(body), 'utf8'), 'base64');

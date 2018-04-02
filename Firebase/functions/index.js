@@ -1,5 +1,5 @@
 // Node modules
-const admin      = require("firebase-admin");
+const admin      = require('firebase-admin');
 const functions  = require('firebase-functions');
 const express    = require('express'); // http://expressjs.com/
 const bodyParser = require('body-parser');
@@ -15,11 +15,11 @@ const aesKey = functions.config().keys.serversymmetrickey; // Used for encryptin
 const encryptedPrefix = '#reddecryptor:'; // Prefix to determine encrypted Reddit posts.
 
 // Module initialisation
-admin.initializeApp(functions.config().firebase);
-const database = admin.database();
+admin.initializeApp(functions.config().firebase); // Load Firebase project config.
+const database = admin.database(); // Firebase Realtime Database.
 
 const app = express();
-app.use(bodyParser.json()); // Middleware for handling POST requests.
+app.use(bodyParser.json()); // Middleware for handling POST JSON requests.
 
 // Allow CORS for all requests.
 app.use('/', function(request, response, next) {
@@ -28,12 +28,17 @@ app.use('/', function(request, response, next) {
     next();
 });
 
-// Register a new user.
+/**
+ * Decrypt body of request using RSA private key.
+ */
+function decryptRequestBody(request) {
+    var buffer = new Buffer(request.body.encryptedContent, 'base64');
+    var decrypted = rsaKey.decrypt(buffer, 'utf8');
+    return JSON.parse(decrypted);
+}
+
 app.post('/register', function(request, response) {
-    // Decrypt body of request using RSA.
-    var body = JSON.parse(
-        rsaKey.decrypt(new Buffer(request.body.encryptedContent, 'base64'), 'utf8')
-    );
+    var body = decryptRequestBody(request);
 
     // Fetch user from database.
     database.ref('users/' + body.username)
@@ -58,12 +63,8 @@ app.post('/register', function(request, response) {
     );
 });
 
-// Log in an existing user.
 app.post('/login', function(request, response) {
-    // Decrypt body of request using RSA.
-    var body = JSON.parse(
-        rsaKey.decrypt(new Buffer(request.body.encryptedContent, 'base64'), 'utf8')
-    );
+    var body = decryptRequestBody(request);
 
     // Fetch user from database.
     database.ref('users/' + body.username)
@@ -95,10 +96,7 @@ app.post('/login', function(request, response) {
 });
 
 app.post('/encrypt', function(request, response) {
-    // Decrypt body of request using RSA.
-    var body = JSON.parse(
-        rsaKey.decrypt(new Buffer(request.body.encryptedContent, 'base64'), 'utf8')
-    );
+    var body = decryptRequestBody(request);
 
     // Fetch user from database.
     database.ref('users/' + body.username)
@@ -117,10 +115,10 @@ app.post('/encrypt', function(request, response) {
                         if (group) {
                             // Check if user is a member or admin of the group being posted to.
                             if (group.admin === body.username || (group.members && group.members[body.username])) {
-                                // Encrypt post with AES.
+                                // Encrypt Reddit post with AES.
                                 var encryptedPost = encryptPost(body.post);
 
-                                // Encrypt post with users RSA public key in base 64.
+                                // Encrypt encrypted post with users RSA public key in base 64.
                                 var userKey = new rsa(user.publicKey);
                                 var encryptedResponse = userKey.encrypt(new Buffer(JSON.stringify(encryptedPost)), 'base64');
 
@@ -162,16 +160,14 @@ function encryptPost(post) {
 }
 
 app.post('/decrypt', function(request, response) {
-    // Decrypt body of request using RSA.
-    var body = JSON.parse(
-        rsaKey.decrypt(new Buffer(request.body.encryptedContent, 'base64'), 'utf8')
-    );
+    var body = decryptRequestBody(request);
 
     // Fetch user from database.
     database.ref('users/' + body.username)
         .once('value')
         .then(function(snapshot) {
             var user = snapshot.val();
+
             if (user) {
                 // Remove search parameters from URL.
                 var url = require('url').parse(body.url);
@@ -188,7 +184,7 @@ app.post('/decrypt', function(request, response) {
                             buffer = Buffer.concat(buffer); // Concatonate received data.
 
                             var encryptedPost = JSON.parse(buffer.toString());
-                            var post = decryptPost(encryptedPost);
+                            var post = decryptPost(encryptedPost); // Decrypt Reddit post.
 
                             // Fetch group from database.
                             database.ref('groups/' + post.group)
@@ -256,10 +252,7 @@ function decryptPost(encryptedPost) {
 }
 
 app.post('/getgroups', function(request, response) {
-    // Decrypt body of request using RSA.
-    var body = JSON.parse(
-        rsaKey.decrypt(new Buffer(request.body.encryptedContent, 'base64'), 'utf8')
-    );
+    var body = decryptRequestBody(request);
 
     // Fetch user from database.
     database.ref('users/' + body.username)
@@ -268,37 +261,44 @@ app.post('/getgroups', function(request, response) {
             var user = snapshot.val();
 
             if (user) {
-                // Fetch all groups from database.
-                database.ref('groups/')
-                    .once('value')
-                    .then(function(snapshot) {
-                        var groups = snapshot.val();
-                        var groupNames = Object.keys(groups);
+                // Treat public key as session token.
+                if (body.publicKey === user.publicKey) {
+                    // Fetch all groups from database.
+                    database.ref('groups/')
+                        .once('value')
+                        .then(function(snapshot) {
+                            var groups = snapshot.val();
+                            var groupNames = Object.keys(groups);
 
-                        var userGroups = {
-                            admin: [], // Groups where user is an administrator.
-                            members: [] // Groups where user is a member.
+                            var userGroups = {
+                                admin: [], // Groups where user is an administrator.
+                                members: [] // Groups where user is a member.
+                            }
+
+                            // Determine which groups the user is an admin or member of.
+                            for (var i = 0; i < groupNames.length; i++) {
+                                var group = groupNames[i];
+                                if (groups[group].admin === body.username)
+                                    userGroups.admin.push(group);
+                                else if (groups[group].members && groups[group].members[body.username])
+                                    userGroups.members.push(group);
+                            }
+
+                            // Encrypt group data with user's RSA public key.
+                            var userKey = new rsa(user.publicKey);
+                            var encryptedResponse = userKey.encrypt(new Buffer(JSON.stringify(userGroups)), 'base64');
+
+                            response.status(200);
+                            response.json({
+                                encryptedContent: encryptedResponse
+                            });
                         }
-
-                        // Determine which groups the user is an admin or member of.
-                        for (var i = 0; i < groupNames.length; i++) {
-                            var group = groupNames[i];
-                            if (groups[group].admin === body.username)
-                                userGroups.admin.push(group);
-                            else if (groups[group].members && groups[group].members[body.username])
-                                userGroups.members.push(group);
-                        }
-
-                        // Encrypt group data with user's RSA public key.
-                        var userKey = new rsa(user.publicKey);
-                        var encryptedResponse = userKey.encrypt(new Buffer(JSON.stringify(userGroups)), 'base64');
-
-                        response.status(200);
-                        response.json({
-                            encryptedContent: encryptedResponse
-                        });
-                    }
-                );
+                    );
+                }
+                else {
+                    response.status(401);
+                    response.send('Public key does not match');
+                }
             }
             else {
                 response.status(401);
@@ -309,10 +309,7 @@ app.post('/getgroups', function(request, response) {
 });
 
 app.post('/getgroupmembers', function(request, response) {
-    // Decrypt body of request using RSA.
-    var body = JSON.parse(
-        rsaKey.decrypt(new Buffer(request.body.encryptedContent, 'base64'), 'utf8')
-    );
+    var body = decryptRequestBody(request);
 
     // Fetch group from database.
     database.ref('groups/' + body.group)
@@ -324,9 +321,11 @@ app.post('/getgroupmembers', function(request, response) {
                 // Only respond to the group admin.
                 if (group.admin === body.username) {
                     var responseBody = { members: [] }
-                    var members = Object.keys(group.members);
-                    for (var i = 0; i < members.length; i++) {
-                        responseBody.members.push(members[i]);
+                    if (group.members) {
+                        var members = Object.keys(group.members);
+                        for (var i = 0; i < members.length; i++) {
+                            responseBody.members.push(members[i]);
+                        }
                     }
 
                     // Fetch user from database.
@@ -336,14 +335,21 @@ app.post('/getgroupmembers', function(request, response) {
                             var user = snapshot.val();
 
                             if (user) {
-                                // Encrypt group data with user's RSA public key.
-                                var userKey = new rsa(user.publicKey);
-                                var encryptedResponse = userKey.encrypt(new Buffer(JSON.stringify(responseBody)), 'base64');
+                                // Treat public key as session token.
+                                if (body.publicKey === user.publicKey) {
+                                    // Encrypt group data with user's RSA public key.
+                                    var userKey = new rsa(user.publicKey);
+                                    var encryptedResponse = userKey.encrypt(new Buffer(JSON.stringify(responseBody)), 'base64');
 
-                                response.status(200);
-                                response.json({
-                                    encryptedContent: encryptedResponse
-                                });
+                                    response.status(200);
+                                    response.json({
+                                        encryptedContent: encryptedResponse
+                                    });
+                                }
+                                else {
+                                    response.status(401);
+                                    response.send('Public key does not match');
+                                }
                             }
                             else {
                                 response.status(401);
@@ -366,10 +372,7 @@ app.post('/getgroupmembers', function(request, response) {
 });
 
 app.post('/addgroupmember', function(request, response) {
-    // Decrypt body of request using RSA.
-    var body = JSON.parse(
-        rsaKey.decrypt(new Buffer(request.body.encryptedContent, 'base64'), 'utf8')
-    );
+    var body = decryptRequestBody(request);
 
     // Fetch user from database.
     database.ref('users/' + body.username)
@@ -378,48 +381,55 @@ app.post('/addgroupmember', function(request, response) {
             var user = snapshot.val();
 
             if (user) {
-                // Fetch group from database.
-                database.ref('groups/' + body.group)
-                    .once('value')
-                    .then(function(snapshot) {
-                        var group = snapshot.val();
+                // Treat public key as session token.
+                if (body.publicKey === user.publicKey) {
+                    // Fetch group from database.
+                    database.ref('groups/' + body.group)
+                        .once('value')
+                        .then(function(snapshot) {
+                            var group = snapshot.val();
 
-                        if (group) {
-                            // Only let the admin add users to the group.
-                            if (group.admin === body.username) {
-                                // Check if new member is a user.
-                                database.ref('users/' + body.member)
-                                    .once('value')
-                                    .then(function(snapshot) {
-                                        user = snapshot.val();
+                            if (group) {
+                                // Only let the admin add users to the group.
+                                if (group.admin === body.username) {
+                                    // Check if new member is an existing user.
+                                    database.ref('users/' + body.member)
+                                        .once('value')
+                                        .then(function(snapshot) {
+                                            user = snapshot.val();
 
-                                        if (user) {
-                                            // Add new group member.
-                                            database.ref('groups/' + body.group + '/members').update({
-                                                [body.member]: 'true'
-                                            });
+                                            if (user) {
+                                                // Add new group member.
+                                                database.ref('groups/' + body.group + '/members').update({
+                                                    [body.member]: 'true'
+                                                });
 
-                                            response.status(200);
-                                            response.send('Success');
+                                                response.status(200);
+                                                response.send('Success');
+                                            }
+                                            else {
+                                                response.status(401);
+                                                response.send('User does not exist');
+                                            }
                                         }
-                                        else {
-                                            response.status(401);
-                                            response.send('User does not exist');
-                                        }
-                                    }
-                                );
+                                    );
+                                }
+                                else {
+                                    response.status(401);
+                                    response.send('Not the group admin.');
+                                }
                             }
                             else {
-                                response.status(401);
-                                response.send('Not the group admin.');
+                                response.status(404);
+                                response.send('Group Does Not Exist');
                             }
                         }
-                        else {
-                            response.status(404);
-                            response.send('Group Does Not Exist');
-                        }
-                    }
-                );
+                    );
+                }
+                else {
+                    response.status(401);
+                    response.send('Public key does not match');
+                }
             }
             else {
                 response.status(401);
@@ -430,10 +440,7 @@ app.post('/addgroupmember', function(request, response) {
 });
 
 app.post('/creategroup', function(request, response) {
-    // Decrypt body of request using RSA.
-    var body = JSON.parse(
-        rsaKey.decrypt(new Buffer(request.body.encryptedContent, 'base64'), 'utf8')
-    );
+    var body = decryptRequestBody(request);
 
     // Fetch user from database.
     database.ref('users/' + body.username)
@@ -442,28 +449,35 @@ app.post('/creategroup', function(request, response) {
             var user = snapshot.val();
 
             if (user) {
-                // Fetch group from database.
-                database.ref('groups/' + body.group)
-                    .once('value')
-                    .then(function(snapshot) {
-                        var group = snapshot.val();
+                // Treat public key as session token.
+                if (body.publicKey === user.publicKey) {
+                    // Fetch group from database.
+                    database.ref('groups/' + body.group)
+                        .once('value')
+                        .then(function(snapshot) {
+                            var group = snapshot.val();
 
-                        if (group) {
-                            response.status(409);
-                            response.send('Group Already Exists!');
-                        }
-                        else {
-                            // Create new group.
-                            database.ref('groups/' + body.group).set({
-                                admin: body.username,
-                                members: {}
-                            });
+                            if (group) {
+                                response.status(409);
+                                response.send('Group Already Exists!');
+                            }
+                            else {
+                                // Create new group.
+                                database.ref('groups/' + body.group).set({
+                                    admin: body.username,
+                                    members: {}
+                                });
 
-                            response.status(200);
-                            response.send('Success');
+                                response.status(200);
+                                response.send('Success');
+                            }
                         }
-                    }
-                );
+                    );
+                }
+                else {
+                    response.status(401);
+                    response.send('Public key does not match');
+                }
             }
             else {
                 response.status(401);
@@ -474,10 +488,7 @@ app.post('/creategroup', function(request, response) {
 });
 
 app.post('/removegroupmember', function(request, response) {
-    // Decrypt body of request using RSA.
-    var body = JSON.parse(
-        rsaKey.decrypt(new Buffer(request.body.encryptedContent, 'base64'), 'utf8')
-    );
+    var body = decryptRequestBody(request);
 
     // Fetch user from database.
     database.ref('users/' + body.username)
@@ -486,33 +497,41 @@ app.post('/removegroupmember', function(request, response) {
             var user = snapshot.val();
 
             if (user) {
-                // Fetch group from database.
-                database.ref('groups/' + body.group)
-                    .once('value')
-                    .then(function(snapshot) {
-                        var group = snapshot.val();
+                // Treat public key as session token.
+                if (body.publicKey === user.publicKey) {
+                    // Fetch group from database.
+                    database.ref('groups/' + body.group)
+                        .once('value')
+                        .then(function(snapshot) {
+                            var group = snapshot.val();
 
-                        if (group) {
-                            if (group.admin === body.username) {
-                                // Remove member from group.
-                                database.ref('groups/' + body.group + '/members').update({
-                                    [body.member]: null
-                                });
+                            if (group) {
+                                // Only group admin can remove a user.
+                                if (group.admin === body.username) {
+                                    // Remove member from group.
+                                    database.ref('groups/' + body.group + '/members').update({
+                                        [body.member]: null
+                                    });
 
-                                response.status(200);
-                                response.send('Success');
+                                    response.status(200);
+                                    response.send('Success');
+                                }
+                                else {
+                                    response.status(401);
+                                    response.send('Not the group admin.');
+                                }
                             }
                             else {
-                                response.status(401);
-                                response.send('Not the group admin.');
+                                response.status(404);
+                                response.send('Group Does Not Exist');
                             }
                         }
-                        else {
-                            response.status(404);
-                            response.send('Group Does Not Exist');
-                        }
-                    }
-                );
+                    );
+                }
+                else {
+                    response.status(401);
+                    response.send('Public key does not match');
+                }
             }
             else {
                 response.status(401);
@@ -523,10 +542,7 @@ app.post('/removegroupmember', function(request, response) {
 });
 
 app.post('/leavegroup', function(request, response) {
-    // Decrypt body of request using RSA.
-    var body = JSON.parse(
-        rsaKey.decrypt(new Buffer(request.body.encryptedContent, 'base64'), 'utf8')
-    );
+    var body = decryptRequestBody(request);
 
     // Fetch user from database.
     database.ref('users/' + body.username)
@@ -535,27 +551,34 @@ app.post('/leavegroup', function(request, response) {
             var user = snapshot.val();
 
             if (user) {
-                // Fetch group from database.
-                database.ref('groups/' + body.group)
-                    .once('value')
-                    .then(function(snapshot) {
-                        var group = snapshot.val();
+                // Treat public key as session token.
+                if (body.publicKey === user.publicKey) {
+                    // Fetch group from database.
+                    database.ref('groups/' + body.group)
+                        .once('value')
+                        .then(function(snapshot) {
+                            var group = snapshot.val();
 
-                        if (group) {
-                            // Remove user from group.
-                            database.ref('groups/' + body.group + '/members').update({
-                                [body.username]: null
-                            });
+                            if (group) {
+                                // Remove user from group.
+                                database.ref('groups/' + body.group + '/members').update({
+                                    [body.username]: null
+                                });
 
-                            response.status(200);
-                            response.send('Success');
+                                response.status(200);
+                                response.send('Success');
+                            }
+                            else {
+                                response.status(404);
+                                response.send('Group Does Not Exist');
+                            }
                         }
-                        else {
-                            response.status(404);
-                            response.send('Group Does Not Exist');
-                        }
-                    }
-                );
+                    );
+                }
+                else {
+                    response.status(401);
+                    response.send('Public key does not match');
+                }
             }
             else {
                 response.status(401);
@@ -566,10 +589,7 @@ app.post('/leavegroup', function(request, response) {
 });
 
 app.post('/deletegroup', function(request, response) {
-    // Decrypt body of request using RSA.
-    var body = JSON.parse(
-        rsaKey.decrypt(new Buffer(request.body.encryptedContent, 'base64'), 'utf8')
-    );
+    var body = decryptRequestBody(request);
 
     // Fetch user from database.
     database.ref('users/' + body.username)
@@ -578,33 +598,41 @@ app.post('/deletegroup', function(request, response) {
             var user = snapshot.val();
 
             if (user) {
-                // Fetch group from database.
-                database.ref('groups/' + body.group)
-                    .once('value')
-                    .then(function(snapshot) {
-                        var group = snapshot.val();
+                // Treat public key as session token.
+                if (body.publicKey === user.publicKey) {
+                    // Fetch group from database.
+                    database.ref('groups/' + body.group)
+                        .once('value')
+                        .then(function(snapshot) {
+                            var group = snapshot.val();
 
-                        if (group) {
-                            if (group.admin === body.username) {
-                                // Delete group.
-                                database.ref('groups/').update({
-                                    [body.group]: null
-                                });
+                            if (group) {
+                                // Only group admin can delete group.
+                                if (group.admin === body.username) {
+                                    // Delete group.
+                                    database.ref('groups/').update({
+                                        [body.group]: null
+                                    });
 
-                                response.status(200);
-                                response.send('Success');
+                                    response.status(200);
+                                    response.send('Success');
+                                }
+                                else {
+                                    response.status(401);
+                                    response.send('Not the group admin.');
+                                }
                             }
                             else {
-                                response.status(401);
-                                response.send('Not the group admin.');
+                                response.status(404);
+                                response.send('Group Does Not Exist');
                             }
                         }
-                        else {
-                            response.status(404);
-                            response.send('Group Does Not Exist');
-                        }
-                    }
-                );
+                    );
+                }
+                else {
+                    response.status(401);
+                    response.send('Public key does not match');
+                }
             }
             else {
                 response.status(401);
